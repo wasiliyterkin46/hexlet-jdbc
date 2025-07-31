@@ -8,25 +8,21 @@ public class Application {
     public static void main(String[] args) throws SQLException {
 
         try (var conn = DriverManager.getConnection("jdbc:h2:mem:hexlet_test")) {
+            UserDAO userDAO = new UserDAO(conn);
 
-            var sql = "CREATE TABLE users (id BIGINT PRIMARY KEY AUTO_INCREMENT, username VARCHAR(255), "
-                    + "phone VARCHAR(255))";
-            try (var statement = conn.createStatement()) {
-                statement.execute(sql);
-            }
+            userDAO.createTableUser();
 
-            var sql2 = "INSERT INTO users (username, phone) VALUES ('tommy', '123456789')";
-            try (var statement2 = conn.createStatement()) {
-                statement2.executeUpdate(sql2);
-            }
+            User newUser = new User("tommy", "123456789");
+            userDAO.save(newUser);
 
-            var sql3 = "SELECT * FROM users";
-            try (var statement3 = conn.createStatement()) {
-                var resultSet = statement3.executeQuery(sql3);
-                while (resultSet.next()) {
-                    System.out.println(resultSet.getString("username"));
-                    System.out.println(resultSet.getString("phone"));
-                }
+            String sql = "SELECT * FROM users";
+            var listUsers = userDAO.getUsers(sql);
+            for (User user : listUsers) {
+                System.out.printf("id = %s, username = %s, phone = %s\n",
+                        user.getId(),
+                        user.getName(),
+                        user.getPhone()
+                );
             }
         }
     }
