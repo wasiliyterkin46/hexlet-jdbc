@@ -53,7 +53,7 @@ public class UserDAO {
     }
 
     public List<User> getUsers(String sqlQuery) throws SQLException {
-        List<User> listUsers = new ArrayList<>();
+        /*List<User> listUsers = new ArrayList<>();
         try (var statement = connection.createStatement()) {
             var resultSet = statement.executeQuery(sqlQuery);
             while (resultSet.next()) {
@@ -61,7 +61,10 @@ public class UserDAO {
             }
 
             return listUsers;
-        }
+        }*/
+
+        PreparedStatement statement = connection.prepareStatement(sqlQuery);
+        return getUsers(statement);
     }
 
     public List<User> getUsers(PreparedStatement preparedStatement) throws SQLException {
@@ -73,6 +76,14 @@ public class UserDAO {
             }
 
             return listUsers;
+        }
+    }
+
+    public void delete(User user) throws SQLException {
+        String sql = "DELETE FROM users WHERE id = ?";
+        try(var preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setLong(1, user.getId());
+            preparedStatement.executeUpdate();
         }
     }
 
